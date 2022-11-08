@@ -7,38 +7,20 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
-	"log"
-	"os"
+	_ "k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"sigs.k8s.io/controller-runtime/pkg/test/test/common"
 	"time"
 )
 
-func check(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-func K8sRestConfig() *rest.Config {
-	myDir, err := os.Getwd()
-	if err != nil {
-		fmt.Println(err)
-	}
-	config, err := clientcmd.BuildConfigFromFlags("", myDir + "/resources/config")
-	if err != nil {
-		log.Fatal(err)
-	}
-	//config.Insecure=true
-	return config
-}
 
 func main() {
 
-	mgr, err := manager.New(K8sRestConfig(),
+	mgr, err := manager.New(common.K8sRestConfig(),
 		manager.Options{
 			Logger: logf.Log.WithName("test"),
 			NewClient: func(cache cache.Cache, config *rest.Config, options client.Options, uncachedObjects ...client.Object) (client.Client, error) {
@@ -46,7 +28,7 @@ func main() {
 			},
 		})
 
-	check(err)
+	common.Check(err)
 	// 打印gvk对象
 	ret, _, err := mgr.GetScheme().ObjectKinds(&v1.Pod{})
 	ret1, _, err := mgr.GetScheme().ObjectKinds(&appsv1.Deployment{})
@@ -64,11 +46,11 @@ func main() {
 		fmt.Printf("%T\n", mgr.GetClient())
 		err = mgr.GetClient().Get(context.TODO(),
 			types.NamespacedName{Namespace: "default", Name: "hello-world-68fdbf5747-679dk"}, pod)
-		check(err)
+		common.Check(err)
 		fmt.Println(pod.Name)
 	}()
 
 	err = mgr.Start(context.Background())
-	check(err)
+	common.Check(err)
 
 }
