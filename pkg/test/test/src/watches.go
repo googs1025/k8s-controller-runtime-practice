@@ -11,10 +11,12 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
-func AddCmWatch(controller controller.Controller) error {
+// AddConfigmapWatch 监听configmap资源
+func AddConfigmapWatch(controller controller.Controller) error {
 	resources := &source.Kind{
 		Type: &v1.ConfigMap{},
 	}
+	// 创建时，仍然会调用controller的Reconcile方法
 	e := handler.Funcs{
 		CreateFunc: func(event event.CreateEvent, limitingInterface workqueue.RateLimitingInterface) {
 			limitingInterface.Add(reconcile.Request{

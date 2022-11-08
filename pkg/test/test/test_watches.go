@@ -37,7 +37,7 @@ func main() {
 	err = mgr.Add(src.NewWeb(handlerFunc, controllerDemo.(*cc.Controller)))
 	common.Check(err)
 	//
-	err = src.AddCmWatch(controllerDemo)
+	err = src.AddConfigmapWatch(controllerDemo)
 	common.Check(err)
 
 	err = mgr.Start(context.Background())
