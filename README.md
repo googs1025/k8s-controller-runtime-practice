@@ -26,6 +26,7 @@ test
 └── test_workqueue.go
 
 ```
+![](https://github.com/googs1025/k8s-controller-runtime-practice/blob/main/image/controller_runtime.jpeg?ram=true)
 
 ### 不同组件
 
