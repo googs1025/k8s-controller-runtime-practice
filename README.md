@@ -29,15 +29,15 @@ test
 
 ### 不同组件
 
-####Schema: 
+#### Schema: 
 定义k8s中资源序列化和反序列化的方法以及资源类型和版本的对应关系(本身是个map对应关系)。
 
 可以根据GVK找到Go Type, 也可以通过Go Type找到GVK。
 
-####Informer机制
+#### Informer机制
 客户端均通过client-go(K8s系统使用client-go作为Go语言的官方编程式交互客户端库,提供对 K8s API Server服务的交互访问)的Informer机制与Kubernetes API Server进行通信的。
 
-####Clients 
+#### Clients 
 提供访问API对象的客户端。
 
 #### Caches 
