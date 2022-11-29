@@ -51,6 +51,7 @@ const (
 )
 
 // Builder builds a Controller.
+// 控制器构造器
 type Builder struct {
 	forInput         ForInput
 	ownsInput        []OwnsInput
@@ -63,11 +64,13 @@ type Builder struct {
 }
 
 // ControllerManagedBy returns a new controller builder that will be started by the provided Manager.
+// ControllerManagedBy 返回一个新的控制器构造器 它将由提供的 Manager 启动
 func ControllerManagedBy(m manager.Manager) *Builder {
 	return &Builder{mgr: m}
 }
 
 // ForInput represents the information set by For method.
+// ForInput 表示 For 方法设置的信息
 type ForInput struct {
 	object           client.Object
 	predicates       []predicate.Predicate
@@ -79,6 +82,10 @@ type ForInput struct {
 // update events by *reconciling the object*.
 // This is the equivalent of calling
 // Watches(&source.Kind{Type: apiType}, &handler.EnqueueRequestForObject{}).
+// For 函数定义了被调谐的对象类型
+// 并配置 ControllerManagedBy 通过调谐对象来响应 create/delete/update 事件
+// 调用 For 函数相当于调用：
+// Watches(&source.Kind{Type: apiType}, &handler.EnqueueRequestForObject{})
 func (blder *Builder) For(object client.Object, opts ...ForOption) *Builder {
 	if blder.forInput.object != nil {
 		blder.forInput.err = fmt.Errorf("For(...) should only be called once, could not assign multiple objects for reconciliation")
@@ -94,6 +101,7 @@ func (blder *Builder) For(object client.Object, opts ...ForOption) *Builder {
 }
 
 // OwnsInput represents the information set by Owns method.
+// OwnsInput 表示 Owns 方法设置的信息
 type OwnsInput struct {
 	object           client.Object
 	predicates       []predicate.Predicate
@@ -103,6 +111,10 @@ type OwnsInput struct {
 // Owns defines types of Objects being *generated* by the ControllerManagedBy, and configures the ControllerManagedBy to respond to
 // create / delete / update events by *reconciling the owner object*.  This is the equivalent of calling
 // Watches(&source.Kind{Type: <ForType-forInput>}, &handler.EnqueueRequestForOwner{OwnerType: apiType, IsController: true}).
+// Owns 定义了 ControllerManagedBy 生成的对象类型
+// 并配置 ControllerManagedBy 通过调谐所有者对象来响应 create/delete/update 事件
+// 这相当于调用：
+// Watches(&source.Kind{Type: <ForType-forInput>}, &handler.EnqueueRequestForOwner{OwnerType: apiType, IsController: true})
 func (blder *Builder) Owns(object client.Object, opts ...OwnsOption) *Builder {
 	input := OwnsInput{object: object}
 	for _, opt := range opts {
@@ -172,6 +184,7 @@ func (blder *Builder) Complete(r reconcile.Reconciler) error {
 }
 
 // Build builds the Application Controller and returns the Controller it created.
+// Build 构建应用程序 ControllerManagedBy 并返回它创建的 Controller
 func (blder *Builder) Build(r reconcile.Reconciler) (controller.Controller, error) {
 	if r == nil {
 		return nil, fmt.Errorf("must provide a non-nil Reconciler")
@@ -188,11 +201,13 @@ func (blder *Builder) Build(r reconcile.Reconciler) (controller.Controller, erro
 	}
 
 	// Set the ControllerManagedBy
+	// 配置 ControllerManagedBy
 	if err := blder.doController(r); err != nil {
 		return nil, err
 	}
 
 	// Set the Watch
+	// 配置 Watch
 	if err := blder.doWatch(); err != nil {
 		return nil, err
 	}
@@ -269,6 +284,7 @@ func (blder *Builder) doWatch() error {
 	return nil
 }
 
+// 根据 GVK 获取控制器名称
 func (blder *Builder) getControllerName(gvk schema.GroupVersionKind) string {
 	if blder.name != "" {
 		return blder.name
@@ -286,6 +302,7 @@ func (blder *Builder) doController(r reconcile.Reconciler) error {
 
 	// Retrieve the GVK from the object we're reconciling
 	// to prepopulate logger information, and to optionally generate a default name.
+	// 从我们正在调谐的对象中检索 GVK
 	gvk, err := getGvk(blder.forInput.object, blder.mgr.GetScheme())
 	if err != nil {
 		return err
@@ -308,6 +325,7 @@ func (blder *Builder) doController(r reconcile.Reconciler) error {
 	controllerName := blder.getControllerName(gvk)
 
 	// Setup the logger.
+	// 配置日志 Logger
 	if ctrlOptions.LogConstructor == nil {
 		log = blder.mgr.GetLogger().WithValues(
 			"controller", controllerName,
@@ -330,6 +348,7 @@ func (blder *Builder) doController(r reconcile.Reconciler) error {
 	}
 
 	// Build the controller and return.
+	// 构造 Controller
 	blder.ctrl, err = newController(controllerName, blder.mgr, ctrlOptions)
 	return err
 }

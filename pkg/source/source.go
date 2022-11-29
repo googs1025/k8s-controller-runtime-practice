@@ -64,6 +64,9 @@ type Source interface {
 // will call its WaitForSync prior to starting workers.
 type SyncingSource interface {
 	Source
+	// Start 是一个内部函数
+	// 只应该由 Controller 调用，向 Informer 注册一个 EventHandler
+	// 将 reconcile.Request 放入队列
 	WaitForSync(ctx context.Context) error
 }
 
@@ -88,11 +91,14 @@ func (ks *kindWithCache) WaitForSync(ctx context.Context) error {
 }
 
 // Kind is used to provide a source of events originating inside the cluster from Watches (e.g. Pod Create).
+// Kind 用于提供来自集群内部的事件源，这些事件来自于 Watches（例如 Pod Create 事件）
 type Kind struct {
 	// Type is the type of object to watch.  e.g. &v1.Pod{}
+	// Type 是 watch 对象的类型，比如 &v1.Pod{}
 	Type client.Object
 
 	// cache used to watch APIs
+	// cache 用于 watch 的 APIs 接口
 	cache cache.Cache
 
 	// started may contain an error if one was encountered during startup. If its closed and does not
@@ -105,14 +111,17 @@ var _ SyncingSource = &Kind{}
 
 // Start is internal and should be called only by the Controller to register an EventHandler with the Informer
 // to enqueue reconcile.Requests.
+// 真正的 Start 函数实现
 func (ks *Kind) Start(ctx context.Context, handler handler.EventHandler, queue workqueue.RateLimitingInterface,
 	prct ...predicate.Predicate) error {
 	// Type should have been specified by the user.
+	// Type 在使用之前必须提前指定
 	if ks.Type == nil {
 		return fmt.Errorf("must specify Kind.Type")
 	}
 
 	// cache should have been injected before Start was called
+	// cache 也应该在调用 Start 之前被注入了
 	if ks.cache == nil {
 		return fmt.Errorf("must call CacheInto on Kind before calling Start")
 	}
@@ -127,6 +136,8 @@ func (ks *Kind) Start(ctx context.Context, handler handler.EventHandler, queue w
 			lastErr error
 		)
 
+		// 从 Cache 中获取 Informer
+		// 并添加一个事件处理程序来添加队列
 		// Tries to get an informer until it returns true,
 		// an error or the specified context is cancelled or expired.
 		if err := wait.PollImmediateUntilWithContext(ctx, 10*time.Second, func(ctx context.Context) (bool, error) {
@@ -154,7 +165,7 @@ func (ks *Kind) Start(ctx context.Context, handler handler.EventHandler, queue w
 			ks.started <- err
 			return
 		}
-
+		// 并添加一个事件处理程序来添加队列
 		i.AddEventHandler(internal.EventHandler{Queue: queue, EventHandler: handler, Predicates: prct})
 		if !ks.cache.WaitForCacheSync(ctx) {
 			// Would be great to return something more informative here

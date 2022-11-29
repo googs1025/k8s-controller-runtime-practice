@@ -58,6 +58,10 @@ type Manager interface {
 	// implements the inject interface - e.g. inject.Client.
 	// Depending on if a Runnable implements LeaderElectionRunnable interface, a Runnable can be run in either
 	// non-leaderelection mode (always running) or leader election mode (managed by leader election if enabled).
+	// Add 将在组件上设置所需的依赖关系，并在调用 Start 时启动组件
+	// Add 将注入接口的依赖关系 - 比如 注入 inject.Client
+	// 根据 Runnable 是否实现了 LeaderElectionRunnable 接口判断
+	// Runnable 可以在非 LeaderElection 模式（始终运行）或 LeaderElection 模式（如果启用了 LeaderElection，则由 LeaderElection 管理）下运行
 	Add(Runnable) error
 
 	// Elected is closed when this manager is elected leader of a group of
@@ -84,6 +88,9 @@ type Manager interface {
 	// If LeaderElection is used, the binary must be exited immediately after this returns,
 	// otherwise components that need leader election might continue to run after the leader
 	// lock was lost.
+	// Start 启动所有已注册的控制器，并一直运行，直到停止通道关闭
+	// 如果启动任何控制器都出错，则返回错误。
+	// 如果使用了 LeaderElection，则必须在此返回后立即退出二进制，否则需要 Leader 选举的组件可能会在 Leader 锁丢失后继续运行
 	Start(ctx context.Context) error
 
 	// GetWebhookServer returns a webhook.Server
@@ -315,8 +322,10 @@ type LeaderElectionRunnable interface {
 }
 
 // New returns a new Manager for creating Controllers.
+// New 返回一个新的 Manager，用于创建 Controllers
 func New(config *rest.Config, options Options) (Manager, error) {
 	// Set default values for options fields
+	// 设置 options 属性的默认值
 	options = setOptionsDefaults(options)
 
 	cluster, err := cluster.New(config, func(clusterOptions *cluster.Options) {

@@ -11,6 +11,10 @@ import (
 	"time"
 )
 
+/*
+	使用controller-runtime调用client-go取出对象
+ */
+
 func main() {
 	// 创建新的manager对象
 	mgr, err := manager.New(common.K8sRestConfig(),
@@ -26,7 +30,7 @@ func main() {
 		mgr.GetClient().Get(context.Background(),
 			types.NamespacedName{
 			Namespace: "default",
-			Name: "hello-world-68fdbf5747-w789w",
+			Name: "hello-world-68fdbf5747-w789w", // 确保k8s中有这个pod
 			}, p)
 		fmt.Println(p.Name, p.Namespace)
 	}()

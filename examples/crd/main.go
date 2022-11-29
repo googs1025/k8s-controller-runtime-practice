@@ -104,12 +104,16 @@ func (r *reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 func main() {
 	ctrl.SetLogger(zap.New())
 
+	// 根据 config 实例化 Manager
+	// config.GetConfigOrDie() 使用默认的配置～/.kube/config
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
 
+	// 将 api 注册到 Scheme，Scheme 提供了 GVK 到 go type 的映射。
+	// 如果多个 crd，需要多次调用 AddToScheme
 	// in a real controller, we'd create a new scheme for this
 	err = api.AddToScheme(mgr.GetScheme())
 	if err != nil {
@@ -117,6 +121,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	// 注册 Controller 到 Manager
+	// For：监控的资源，相当于调用 Watches(&source.Kind{Type: apiType},&handler.EnqueueRequestForObject{})
+	// Owns：拥有的下属资源，如果 corev1.Pod{} 资源属于 api.ChaosPod{}，也将会被监控，相当于调用 Watches(&source.Kind{Type: <ForType-apiType>}, &handler.EnqueueRequestForOwner{OwnerType: apiType, IsController: true})
+	// reconciler 结构体：继承 Reconciler，需要实现该结构体和 Reconcile 方法
+	// mgr.GetClient()、mgr.GetScheme() 是 Client 和 Scheme，前面的 manager.New 初始化了
 	err = ctrl.NewControllerManagedBy(mgr).
 		For(&api.ChaosPod{}).
 		Owns(&corev1.Pod{}).
@@ -128,7 +137,7 @@ func main() {
 		setupLog.Error(err, "unable to create controller")
 		os.Exit(1)
 	}
-
+	// 构建webhook
 	err = ctrl.NewWebhookManagedBy(mgr).
 		For(&api.ChaosPod{}).
 		Complete()
@@ -138,6 +147,7 @@ func main() {
 	}
 
 	setupLog.Info("starting manager")
+	// 启动manager,实际上是启动controller
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)

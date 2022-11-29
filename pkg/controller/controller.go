@@ -85,6 +85,8 @@ type Controller interface {
 
 // New returns a new Controller registered with the Manager.  The Manager will ensure that shared Caches have
 // been synced before the Controller is Started.
+// New 返回一个 Manager 处注册的 Controller
+// Manager 将确保共享缓存在控制器启动前已经同步
 func New(name string, mgr manager.Manager, options Options) (Controller, error) {
 	c, err := NewUnmanaged(name, mgr, options)
 	if err != nil {
@@ -97,6 +99,8 @@ func New(name string, mgr manager.Manager, options Options) (Controller, error) 
 
 // NewUnmanaged returns a new controller without adding it to the manager. The
 // caller is responsible for starting the returned controller.
+// New 返回一个 Manager 处注册的 Controller
+// Manager 将确保共享缓存在控制器启动前已经同步
 func NewUnmanaged(name string, mgr manager.Manager, options Options) (Controller, error) {
 	if options.Reconciler == nil {
 		return nil, fmt.Errorf("must specify Reconciler")
@@ -140,6 +144,7 @@ func NewUnmanaged(name string, mgr manager.Manager, options Options) (Controller
 	}
 
 	// Create controller with dependencies set
+	// 创建 Controller 并配置依赖关系
 	return &controller.Controller{
 		Do: options.Reconciler,
 		MakeQueue: func() workqueue.RateLimitingInterface {

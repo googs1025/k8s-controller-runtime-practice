@@ -17,9 +17,12 @@ import (
 	"time"
 )
 
+/*
+	使用controller-runtime打印GVK
+ */
 
 func main() {
-
+	// 创建manager
 	mgr, err := manager.New(common.K8sRestConfig(),
 		manager.Options{
 			Logger: logf.Log.WithName("test"),

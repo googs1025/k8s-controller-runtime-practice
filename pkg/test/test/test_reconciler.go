@@ -25,6 +25,7 @@ func main() {
 		Reconciler: &src.ControllerDemo{},
 	})
 	common.Check(err)
+	// 资源对象
 	resources := &source.Kind{
 		Type: &v1.Pod{},
 	}
@@ -33,7 +34,7 @@ func main() {
 	common.Check(err)
 	web := src.NewWeb(handlerFunc, controllerDemo.(*cc.Controller))
 
-	err = mgr.Add(web)
+	err = mgr.Add(web) // 入参：Runnable接口对象，实现Start方法。
 	common.Check(err)
 	err = mgr.Start(context.Background())
 	common.Check(err)

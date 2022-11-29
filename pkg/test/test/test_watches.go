@@ -27,19 +27,20 @@ func main() {
 	})
 	common.Check(err)
 
+	// 资源对象
 	resources := &source.Kind{
 		Type: &v1.Pod{},
 	}
 	handlerFunc := &handler.EnqueueRequestForObject{}
 	err = controllerDemo.Watch(resources, handlerFunc)
 	common.Check(err)
-	//
+	// 注入自定义对象
 	err = mgr.Add(src.NewWeb(handlerFunc, controllerDemo.(*cc.Controller)))
 	common.Check(err)
-	//
+
 	err = src.AddConfigmapWatch(controllerDemo)
 	common.Check(err)
-
+	// 启动manager
 	err = mgr.Start(context.Background())
 	common.Check(err)
 

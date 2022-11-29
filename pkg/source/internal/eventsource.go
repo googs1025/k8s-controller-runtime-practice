@@ -33,6 +33,7 @@ var log = logf.RuntimeLog.WithName("source").WithName("EventHandler")
 
 var _ cache.ResourceEventHandler = EventHandler{}
 
+// EventHandler 实现了 cache.ResourceEventHandler 接口
 // EventHandler adapts a handler.EventHandler interface to a cache.ResourceEventHandler interface.
 type EventHandler struct {
 	EventHandler handler.EventHandler
@@ -42,9 +43,11 @@ type EventHandler struct {
 
 // OnAdd creates CreateEvent and calls Create on EventHandler.
 func (e EventHandler) OnAdd(obj interface{}) {
+	// kubernetes 对象被创建的事件
 	c := event.CreateEvent{}
 
 	// Pull Object out of the object
+	// 获取对象 metav1.Object
 	if o, ok := obj.(client.Object); ok {
 		c.Object = o
 	} else {
@@ -53,12 +56,14 @@ func (e EventHandler) OnAdd(obj interface{}) {
 		return
 	}
 
+	// Predicates 用于事件过滤，循环调用 Predicates 的 Create 函数
 	for _, p := range e.Predicates {
 		if !p.Create(c) {
 			return
 		}
 	}
 
+	// 调用 EventHandler 的 Create 函数
 	// Invoke create handler
 	e.EventHandler.Create(c, e.Queue)
 }
@@ -91,6 +96,7 @@ func (e EventHandler) OnUpdate(oldObj, newObj interface{}) {
 	}
 
 	// Invoke update handler
+	// 调用 EventHandler 的 Update 函数
 	e.EventHandler.Update(u, e.Queue)
 }
 
@@ -106,6 +112,7 @@ func (e EventHandler) OnDelete(obj interface{}) {
 	var ok bool
 	if _, ok = obj.(client.Object); !ok {
 		// If the object doesn't have Metadata, assume it is a tombstone object of type DeletedFinalStateUnknown
+		// 假设对象没有 Metadata，假设是一个 DeletedFinalStateUnknown 类型的对象
 		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
 		if !ok {
 			log.Error(nil, "Error decoding objects.  Expected cache.DeletedFinalStateUnknown",
@@ -134,5 +141,6 @@ func (e EventHandler) OnDelete(obj interface{}) {
 	}
 
 	// Invoke delete handler
+	// 调用 EventHandler 的 delete 函数
 	e.EventHandler.Delete(d, e.Queue)
 }
