@@ -17,7 +17,7 @@ func main() {
 	mgr, err := manager.New(common.K8sRestConfig(),
 		manager.Options{
 		Logger: logf.Log.WithName("test"),
-		Namespace: "default",
+		Namespace: "default", // 针对namespace
 		})
 	common.Check(err)
 	// 创建一个controller控制器

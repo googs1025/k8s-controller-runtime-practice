@@ -20,6 +20,7 @@ func main() {
 	mgr, err := manager.New(common.K8sRestConfig(),
 		manager.Options{
 		Logger: logf.Log.WithName("test"),
+
 		})
 	common.Check(err)
 

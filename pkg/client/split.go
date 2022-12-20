@@ -109,6 +109,7 @@ func (d *delegatingReader) shouldBypassCache(obj runtime.Object) (bool, error) {
 	if meta.IsListType(obj) {
 		gvk.Kind = strings.TrimSuffix(gvk.Kind, "List")
 	}
+	// 如果uncachedGVKs里面有，才会返回能够从非缓存走。
 	if _, isUncached := d.uncachedGVKs[gvk]; isUncached {
 		return true, nil
 	}
@@ -122,11 +123,13 @@ func (d *delegatingReader) shouldBypassCache(obj runtime.Object) (bool, error) {
 
 // Get retrieves an obj for a given object key from the Kubernetes Cluster.
 func (d *delegatingReader) Get(ctx context.Context, key ObjectKey, obj Object) error {
+	// 判断是否从缓存读
 	if isUncached, err := d.shouldBypassCache(obj); err != nil {
 		return err
-	} else if isUncached {
+	} else if isUncached { // 不从缓存走
 		return d.ClientReader.Get(ctx, key, obj)
 	}
+	// 从缓存里取
 	return d.CacheReader.Get(ctx, key, obj)
 }
 

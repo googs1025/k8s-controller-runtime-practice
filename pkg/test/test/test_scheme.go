@@ -26,6 +26,7 @@ func main() {
 	mgr, err := manager.New(common.K8sRestConfig(),
 		manager.Options{
 			Logger: logf.Log.WithName("test"),
+			// 加入这个对象，会不走默认缓存
 			NewClient: func(cache cache.Cache, config *rest.Config, options client.Options, uncachedObjects ...client.Object) (client.Client, error) {
 				return cluster.DefaultNewClient(cache, config, options, &v1.Pod{})
 			},
