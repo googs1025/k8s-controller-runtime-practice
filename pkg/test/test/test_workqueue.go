@@ -62,13 +62,13 @@ func queuePractice1() {
 			item, _ := queue.Get()
 			fmt.Println(item.(reconcile.Request).NamespacedName)
 
-			//手动模拟处理 数据
+			// 手动模拟处理数据
 			queue.Done(item)
 		}
 	}()
 
 	for i := 0; i < 100; i++ {
-		queue.AddRateLimited(newItem("abc"+strconv.Itoa(i), "default")) // 限流
+		queue.AddRateLimited(newItem("abc" + strconv.Itoa(i), "default")) // 限流
 		//time.Sleep(time.Millisecond * 200)
 
 	}

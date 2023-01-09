@@ -38,6 +38,7 @@ func main() {
 	ret1, _, err := mgr.GetScheme().ObjectKinds(&appsv1.Deployment{})
 	fmt.Println(ret)
 	fmt.Println(ret1)
+	// 拿到全部的gvk
 	for k, v := range mgr.GetScheme().AllKnownTypes() {
 		fmt.Println("key:", k.String())
 		fmt.Println("value:", v.String())

@@ -18,6 +18,7 @@ func K8sRestConfig() *rest.Config {
 	if err != nil {
 		fmt.Println(err)
 	}
+	// 读取配置文件，体外
 	config, err := clientcmd.BuildConfigFromFlags("", myDir + "/resources/config")
 	if err != nil {
 		log.Fatal(err)

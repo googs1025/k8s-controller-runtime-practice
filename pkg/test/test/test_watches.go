@@ -27,10 +27,11 @@ func main() {
 	})
 	common.Check(err)
 
-	// 资源对象
+	// source：事件流，用于监听资源对象
 	resources := &source.Kind{
 		Type: &v1.Pod{},
 	}
+	// 框架定义好的回调方法
 	handlerFunc := &handler.EnqueueRequestForObject{}
 	err = controllerDemo.Watch(resources, handlerFunc)
 	common.Check(err)

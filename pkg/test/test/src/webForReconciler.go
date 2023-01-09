@@ -12,7 +12,7 @@ import (
 
 type Web struct {
 	h handler.EventHandler
-	controllerDemo *controller.Controller
+	controllerDemo *controller.Controller // 控制器
 
 }
 

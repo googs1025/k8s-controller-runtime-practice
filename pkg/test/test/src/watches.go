@@ -19,6 +19,7 @@ func AddConfigmapWatch(controller controller.Controller) error {
 	// 创建时，仍然会调用controller的Reconcile方法
 	e := handler.Funcs{
 		CreateFunc: func(event event.CreateEvent, limitingInterface workqueue.RateLimitingInterface) {
+			// 把add事件的Request加入工作队列
 			limitingInterface.Add(reconcile.Request{
 				types.NamespacedName{
 					Name: "test",
