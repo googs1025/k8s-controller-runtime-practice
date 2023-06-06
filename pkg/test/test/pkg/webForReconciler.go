@@ -1,4 +1,4 @@
-package src
+package pkg
 
 import (
 	"context"
@@ -10,23 +10,23 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
 
-type Web struct {
-	h handler.EventHandler
+//
+type MyManager struct {
+	h              handler.EventHandler
 	controllerDemo *controller.Controller // 控制器
 
 }
 
-
-func NewWeb(h handler.EventHandler, controllerDemo *controller.Controller) *Web {
-	return &Web{
-		h: h,
+func NewMyManager(h handler.EventHandler, controllerDemo *controller.Controller) *MyManager {
+	return &MyManager{
+		h:              h,
 		controllerDemo: controllerDemo,
 	}
 }
 
-var _ manager.Runnable = &Web{}	// 是否实现此接口
+var _ manager.Runnable = &MyManager{} // 是否实现此接口
 
-func (w *Web) Start(ctx context.Context) error {
+func (w *MyManager) Start(ctx context.Context) error {
 	r := gin.New()
 	r.GET("/add", func(c *gin.Context) {
 		p := &v1.Pod{}
@@ -38,5 +38,3 @@ func (w *Web) Start(ctx context.Context) error {
 	r.Run(":8081")
 	return nil
 }
-
-

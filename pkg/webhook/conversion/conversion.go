@@ -119,7 +119,7 @@ func (wh *Webhook) handleConvertRequest(req *apix.ConversionRequest) (*apix.Conv
 	}, nil
 }
 
-// convertObject will convert given a src object to dst object.
+// convertObject will convert given a pkg object to dst object.
 // Note(droot): couldn't find a way to reduce the cyclomatic complexity under 10
 // without compromising readability, so disabling gocyclo linter
 func (wh *Webhook) convertObject(src, dst runtime.Object) error {
@@ -127,7 +127,7 @@ func (wh *Webhook) convertObject(src, dst runtime.Object) error {
 	dstGVK := dst.GetObjectKind().GroupVersionKind()
 
 	if srcGVK.GroupKind() != dstGVK.GroupKind() {
-		return fmt.Errorf("src %T and dst %T does not belong to same API Group", src, dst)
+		return fmt.Errorf("pkg %T and dst %T does not belong to same API Group", src, dst)
 	}
 
 	if srcGVK == dstGVK {

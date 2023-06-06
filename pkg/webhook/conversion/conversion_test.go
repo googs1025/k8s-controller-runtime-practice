@@ -226,7 +226,7 @@ var _ = Describe("Conversion Webhook", func() {
 		Expect(got).To(Equal(expected))
 	})
 
-	It("should return error when dest/src objects belong to different API groups", func() {
+	It("should return error when dest/pkg objects belong to different API groups", func() {
 		v1Obj := makeV1Obj()
 
 		convReq := &apix.ConversionReview{
@@ -247,7 +247,7 @@ var _ = Describe("Conversion Webhook", func() {
 		Expect(convReview.Response.ConvertedObjects).To(BeEmpty())
 	})
 
-	It("should return error when dest/src objects are of same type", func() {
+	It("should return error when dest/pkg objects are of same type", func() {
 
 		v1Obj := makeV1Obj()
 

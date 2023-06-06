@@ -13,14 +13,13 @@ import (
 
 /*
 	使用controller-runtime调用client-go取出对象
- */
+*/
 
 func main() {
 	// 创建新的manager对象
 	mgr, err := manager.New(common.K8sRestConfig(),
 		manager.Options{
-		Logger: logf.Log.WithName("test"),
-
+			Logger: logf.Log.WithName("test"),
 		})
 	common.Check(err)
 
@@ -31,8 +30,8 @@ func main() {
 		// 取到client，可以执行crud
 		mgr.GetClient().Get(context.Background(),
 			types.NamespacedName{
-			Namespace: "default",
-			Name: "hello-world-68fdbf5747-w789w", // 确保k8s中有这个pod
+				Namespace: "default",
+				Name:      "hello-world-68fdbf5747-w789w", // 确保k8s中有这个pod
 			}, p)
 
 		fmt.Println(p.Name, p.Namespace)

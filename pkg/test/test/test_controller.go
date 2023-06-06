@@ -9,25 +9,26 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 	"sigs.k8s.io/controller-runtime/pkg/test/test/common"
-	"sigs.k8s.io/controller-runtime/pkg/test/test/src"
+	"sigs.k8s.io/controller-runtime/pkg/test/test/pkg"
 )
 
 func main() {
-	// 建立管理器 manager
+	// 1. 建立管理器 manager
 	mgr, err := manager.New(common.K8sRestConfig(),
 		manager.Options{
-		Logger: logf.Log.WithName("test"),
-		Namespace: "default", // 针对namespace
+			Logger:    logf.Log.WithName("test"),
+			Namespace: "default", // 针对namespace
 		})
 	common.Check(err)
-	// 创建一个controller控制器
+
+	// 2. 创建一个controller控制器
 	controllerDemo, err := controller.New("test-controller", mgr, controller.Options{
-		Reconciler: &src.ControllerDemo{},
+		Reconciler: &pkg.ControllerDemo{},
 	})
 	common.Check(err)
 	// 资源
 	resources := &source.Kind{
-		Type: &v1.Pod{},// 监听资源
+		Type: &v1.Pod{}, // 监听资源
 	}
 	// 监听时 当有不同事件触发时，应该如何回调，使用内置对象(也可以自己实现)
 	handlerFunc := &handler.EnqueueRequestForObject{}
@@ -38,6 +39,4 @@ func main() {
 	err = mgr.Start(context.Background())
 	common.Check(err)
 
-
 }
-

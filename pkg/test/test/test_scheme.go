@@ -19,7 +19,7 @@ import (
 
 /*
 	使用controller-runtime打印GVK
- */
+*/
 
 func main() {
 	// 创建manager

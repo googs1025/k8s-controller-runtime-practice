@@ -1,4 +1,4 @@
-package src
+package pkg
 
 import (
 	v1 "k8s.io/api/core/v1"
@@ -22,7 +22,7 @@ func AddConfigmapWatch(controller controller.Controller) error {
 			// 把add事件的Request加入工作队列
 			limitingInterface.Add(reconcile.Request{
 				types.NamespacedName{
-					Name: "test",
+					Name:      "test",
 					Namespace: "default",
 				},
 			})

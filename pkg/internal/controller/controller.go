@@ -167,7 +167,7 @@ func (c *Controller) Watch(src source.Source, evthdler handler.EventHandler, prc
 	}
 
 	c.LogConstructor(nil).Info("Starting EventSource", "source", src)
-	// 调用 src 的 Start 函数
+	// 调用 pkg 的 Start 函数
 	// Watch 函数可以看到最终是去调用的 Source 这个参数的 Start 函数，Source 是事件的源，如对资源对象的 Create、Update、Delete 操作，
 	// 需要由 event.EventHandlers 将 reconcile.Requests 入队列进行处理。
 	return src.Start(c.ctx, evthdler, c.Queue, prct...)

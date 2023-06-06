@@ -1,5 +1,4 @@
-package src
-
+package pkg
 
 import (
 	"context"
@@ -17,4 +16,3 @@ func (c *ControllerDemo) Reconcile(ctx context.Context, req controllerruntime.Re
 	fmt.Println(req.NamespacedName)
 	return controllerruntime.Result{}, nil
 }
-

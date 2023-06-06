@@ -10,20 +10,20 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 	"sigs.k8s.io/controller-runtime/pkg/test/test/common"
-	"sigs.k8s.io/controller-runtime/pkg/test/test/src"
+	"sigs.k8s.io/controller-runtime/pkg/test/test/pkg"
 )
 
 func main() {
 	// 新增 manager管理器
 	mgr, err := manager.New(common.K8sRestConfig(),
 		manager.Options{
-		Logger: logf.Log.WithName("test"),
-		Namespace: "default",
+			Logger:    logf.Log.WithName("test"),
+			Namespace: "default",
 		})
 	common.Check(err)
 	// 新增 controller
 	controllerDemo, err := controller.New("test-controller", mgr, controller.Options{
-		Reconciler: &src.ControllerDemo{},
+		Reconciler: &pkg.ControllerDemo{},
 	})
 	common.Check(err)
 
@@ -36,18 +36,13 @@ func main() {
 	err = controllerDemo.Watch(resources, handlerFunc)
 	common.Check(err)
 	// 注入自定义对象
-	err = mgr.Add(src.NewWeb(handlerFunc, controllerDemo.(*cc.Controller)))
+	err = mgr.Add(pkg.NewMyManager(handlerFunc, controllerDemo.(*cc.Controller)))
 	common.Check(err)
 
-	err = src.AddConfigmapWatch(controllerDemo)
+	err = pkg.AddConfigmapWatch(controllerDemo)
 	common.Check(err)
 	// 启动manager
 	err = mgr.Start(context.Background())
 	common.Check(err)
 
-
 }
-
-
-
-
